@@ -1,0 +1,8 @@
+[package]
+name = "mqtt_subscriber"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rumqttc = "0.24"
+tokio = { version = "1", features = ["full"] }
