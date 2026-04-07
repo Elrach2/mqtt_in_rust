@@ -18,9 +18,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
         // On affiche seulement les messages publiés
         if let Event::Incoming(Packet::Publish(publish)) = event {
             let payload = String::from_utf8_lossy(&publish.payload);
-            println!("📨 Message reçu sur '{}' : {}", publish.topic, payload);
-        } else {
-            println!("Event subscriber : {:?}", event);
+            match &*payload {
+                "ON"    =>  println!("Lampe \"ALLUME\""),
+                "OFF"   =>  println!("Lampe \"ETEINT\""),
+                _       =>  println!("Lampe \"ALLUME\""),
+            }
         }
     }
 }

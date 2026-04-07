@@ -10,17 +10,27 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let (client, mut eventloop) = AsyncClient::new(options, 10);
 
+    let (on , off) = ("ON","OFF");
+    let mut state  =  1;
+    
     // Tâche qui publie toutes les 2 secondes
     tokio::spawn(async move {
-        let mut i = 0;
         loop {
-            let payload = format!("Hello from Rust Publisher ! Compteur = {}", i).into_bytes();
-            if let Err(e) = client.publish("test/topic", QoS::AtMostOnce, false, payload).await {
-                eprintln!("Erreur publish: {}", e);
-                break;
+
+            if state == 1 {
+                if let Err(e) = client.publish("test/topic", QoS::AtMostOnce, false, on.as_bytes()).await {
+                    eprintln!("Erreur publish: {}", e);
+                    break;
+                }
+                state ^= 1;
+            }else {
+                if let Err(e) = client.publish("test/topic", QoS::AtMostOnce, false, off.as_bytes()).await {
+                    eprintln!("Erreur publish: {}", e);
+                    break;
+                }
+                state ^= 1;
             }
-            println!("→ Publié : Hello from Rust Publisher ! Compteur = {}", i);
-            i += 1;
+
             time::sleep(Duration::from_secs(2)).await;
         }
     });
@@ -31,3 +41,4 @@ async fn main() -> Result<(), Box<dyn Error>> {
         println!("Event publisher : {:?}", event);
     }
 }
+

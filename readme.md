@@ -26,4 +26,5 @@ Dans un terminal dédié (laisse-le ouvert) :
 
 **NOTE** : Si tu vois des erreurs, c'est sûrement dû au port de connexion car le service mosquitto lancé précédemment utilise le même port que celui spécifié dans le `rumqttd.toml` qui est 1883.
 Pour y remédier, il suffit de changer le port dans la configuration `.toml` en mettant le port que tu veux.
-Cela implique que tu dois mettre le même port de connexion dans les autres programmes.
+Cela implique que tu dois mettre le même port de connexion dans les autres programmes.  
+Les clients ne doivent pas avoir le même id car le broker n'accepte qu'un seul client avec le même id.  
