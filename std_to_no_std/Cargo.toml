@@ -1,0 +1,8 @@
+[package]
+name = "std_to_no_std"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+esp-hal = { version = "1.0.0", features = ["esp32"] }
+panic-halt = "1.0.0"
