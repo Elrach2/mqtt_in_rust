@@ -32,9 +32,9 @@ async fn main(spawner: Spawner) -> ! {
     let led1 = Output::new(peripherals.GPIO2, Level::Low, OutputConfig::default());
     let led2 = Output::new(peripherals.GPIO4, Level::Low, OutputConfig::default());
     
-    //
-    spawner.spawn(fast_blink(led1));
-    spawner.spawn(slow_blink(led2));
+    //On ajoute let _ = ... ; lorsque l'on n'utilise pas le résultat renvoyer par une fonction
+    let _ = spawner.spawn(fast_blink(led1));
+    let _ = spawner.spawn(slow_blink(led2));
 
     loop{
         Timer::after(Duration::from_secs(1)).await;
@@ -55,7 +55,7 @@ async fn fast_blink(mut led: Output<'static>){
 #[embassy_executor::task]
 async fn slow_blink(mut led: Output<'static>){
     loop{
-        Timer::after(Duration::from_secs(1)).await;
         led.toggle();
+        Timer::after(Duration::from_secs(1)).await;
     }
 }
