@@ -1,62 +1,61 @@
-//La premiere ligne est indispensable pour le bon fonctionnement du programme
 #![no_std]
-//Cette attribut nous dit que nous n'utiliserons pas le point d'entré standard
 #![no_main]
 
-//Le panic_handler s'execute lorsqu'une erreur survient
 #[panic_handler]
 fn panic(_: &core::panic::PanicInfo) -> !{
     loop{}
 }
-// Pour la generation du descripteur d'application
 esp_bootloader_esp_idf::esp_app_desc!();
 
 
-//La ligne suivante nous donne l'attribut qui nous permettra de spécifié le point d'entre de notre
-//programme
-use esp_hal::main;
 use esp_hal::clock::CpuClock;
-// Cette inclusion nous permet de configurer les gpio ou pin
 use esp_hal::gpio::{Level, Output,OutputConfig};
 // Celle ci nous permettra de faire la temporisation
-use esp_hal::time::{Duration, Instant};
-
-
-/*Si tu veux tu peux utiliser un crate pour gerer les paniques mais ici nous allons ecrir notre
-* fonction qui gere  les paniques. En ce moment il faut ajouter le crate dans le Cargo.toml
-* use panic_halt as _; 
-*/
+use esp_hal::timer::timg::TimerGroup;
+use embassy_executor::Spawner;
+use embassy_time::{Duration, Timer};
 
 /*
 * Nous devons préciser le point d'entré du programme car nous n'utilisons pas le std.
-* L'attibut #[main] nous petmet de faire ça
-* Il est obligatoire que cette fonction ne retourne rien   " () -> ! "
-* Donc nous devons mettre une boucle infinie. Nous avons le choix entre le loop{} ou l'expression suivante ou son équivalent
-*   while true {
-*   }
-*   panic!("..."); 
+* L'attibut #[esp_rtos::main] nous petmet de faire ça
+* Il faut ajouter l'expression "async" devant "fn main(spawner: Spawner) -> !" 
 */
-#[main]
-fn main() -> ! {
+#[esp_rtos::main]
+async fn main(spawner: Spawner) -> ! {
     
     let config      =   esp_hal::Config::default().with_cpu_clock(CpuClock::max());
-    let peripheral  =   esp_hal::init(config); 
+    let peripherals  =   esp_hal::init(config); 
 
-    let mut led     =   Output::new(peripheral.GPIO2, Level::High, OutputConfig::default());
+    let timg0 = TimerGroup::new(peripherals.TIMG0);
+    esp_rtos::start(timg0.timer0);
+
+    let led1 = Output::new(peripherals.GPIO2, Level::Low, OutputConfig::default());
+    let led2 = Output::new(peripherals.GPIO4, Level::Low, OutputConfig::default());
     
+    //
+    spawner.spawn(fast_blink(led1));
+    spawner.spawn(slow_blink(led2));
+
+    loop{
+        Timer::after(Duration::from_secs(1)).await;
+    }
+}
+
+
+/*Les taches s'exécutant en parallèle*/
+
+#[embassy_executor::task]
+async fn fast_blink(mut led: Output<'static>){
     loop{
         led.toggle();
-        blocking_time(Duration::from_millis(1000));
+        Timer::after(Duration::from_millis(100)).await;
     }
 }
 
-// fonction qui sert a la temporisation
-
-fn blocking_time(duration : Duration ) {
-    let delay_start     =   Instant::now();
-    while delay_start.elapsed() < duration {
-        //attend
+#[embassy_executor::task]
+async fn slow_blink(mut led: Output<'static>){
+    loop{
+        Timer::after(Duration::from_secs(1)).await;
+        led.toggle();
     }
 }
-
-/* Pour plus d'info consulter le lien suivant:  https://esp32.implrust.com/std-to-no-std/index.html */

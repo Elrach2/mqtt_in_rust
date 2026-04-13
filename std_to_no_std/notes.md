@@ -1,29 +1,53 @@
-# Différences entre programmation embarquée et standard en Rust
+# Programmation asynchrone  
 
-La programmation embarquée en Rust diffère de la programmation standard sur plusieurs points:
+La programmation asynchrone nous permet d'executer plusieurs taches en simultané.
+Cette abstractions nous permet de gerer le wifi le mqtt et d'autres taches en parallèle.
 
-- L'environnement d'exécution
-- Le point d'entrer principale
-- Dependence et structure.
-- Compilation et cible
-- Gestion de la mémoire
+## .cargo/config.toml et rust-toolchain.toml
 
-## Structure du projet
+Ces fichiers peuvent restet tel qu'ils sont. Pas besion de modification pour le moment.
 
-La structure d'un projet pour du *bare metal* n'est pas celle générée par `cargo new`. Le contenu est également différent.
+## Cargo.toml
 
-## Objectif de cette étape
+Nous allons ajouter la fonctionnalité "unstable" a `esp-hal` les crates nécessaires qui sont:
+> esp-rtos = { version = "0.2.0", features = ["embassy", "esp32"] }
+> embassy-executor = "0.9.1"
+> embassy-time = "0.5.0"
 
-Cette étape vous permettra de découvrir :
+## src/main.rs
 
-- La structure d'un projet embarqué
-- Les règles à respecter pour parvenir à compiler votre code sans erreur
+Il faut :
 
-# Résumé
+  ajouter
+> use esp_hal::timer::timg::TimerGroup;
+> use embassy_executor::Spawner;
+> use embassy_time::{Duration, Timer};
+  
+  Changer l'attribut du point d'entré et la ajouter async devant main  
+> #[esp_rtos::main]
+> async fn main(spawner: Spawner) -> !
 
-La programmation standard en Rust s'appuie sur un OS et sa bibliothèque std, offrant confort et abstractions. La programmation embarquée (no_std) fonctionne sans OS, donne un contrôle matériel direct, mais nécessite de gérer manuellement les aspects bas niveau (allocateur, entrées/sorties, interruptions).
+  initialise la configuration CPU, les périphériques, le groupe de timers et l’exécuteur Embassy
+> let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
+> let peripherals = esp_hal::init(config);
+>
+> let timg0 = TimerGroup::new(peripherals.TIMG0);
+> esp_rtos::start(timg0.timer0);
+
+  Lancer les taches asynchrones avec
+> spawner.spawn(fast_blink(led1));
+> spawner.spawn(slow_blink(led2));
+
+  Après avoir creer les taches
+> #[embassy_executor::task]
+> async fn fast_blink(mut led: Output<'static>){
+> loop{
+> led.toggle();
+> Timer::after(Duration::from_millis(100)).await;
+> }
+> }
 
 ---
 
 > **Pour plus d'informations, consultez le lien suivant :**  
-> [https://esp32.implrust.com/std-to-no-std/index.html](https://esp32.implrust.com/std-to-no-std/index.html)
+> [https://embassy.dev/](https://embassy.dev/)
