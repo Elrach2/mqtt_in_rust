@@ -9,8 +9,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let (client, mut eventloop) = AsyncClient::new(options, 10);
 
     // On s'abonne au topic (le # accepte tout sous-test/)
-    client.subscribe("test/#", QoS::AtMostOnce).await.unwrap();
-    println!("✅ Abonné au topic test/#");
+    client.subscribe("temperature/1", QoS::AtMostOnce).await.unwrap();
+    println!("✅ Abonné au topic temperature/1");
 
     loop {
         let event = eventloop.poll().await?;
@@ -18,6 +18,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         // On affiche seulement les messages publiés
         if let Event::Incoming(Packet::Publish(publish)) = event {
             let payload = String::from_utf8_lossy(&publish.payload);
+            println!("{}", payload);
             match &*payload {
                 "ON"    =>  println!("Lampe \"ALLUME\""),
                 "OFF"   =>  println!("Lampe \"ETEINT\""),
