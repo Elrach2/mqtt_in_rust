@@ -4,7 +4,7 @@ target = "xtensa-esp32-none-elf"
 
 #
 [unstable]
-build-std = ["core"]
+build-std = ["core", "alloc"]
 
 # Pour le linker
 [target.xtensa-esp32-none-elf]

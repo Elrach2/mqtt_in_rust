@@ -18,13 +18,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
         loop {
 
             if state == 1 {
-                if let Err(e) = client.publish("test/topic", QoS::AtMostOnce, false, on.as_bytes()).await {
+                if let Err(e) = client.publish("Commande/S1", QoS::AtMostOnce, false, on.as_bytes()).await {
                     eprintln!("Erreur publish: {}", e);
                     break;
                 }
                 state ^= 1;
             }else {
-                if let Err(e) = client.publish("test/topic", QoS::AtMostOnce, false, off.as_bytes()).await {
+                if let Err(e) = client.publish("Commande/S1", QoS::AtMostOnce, false, off.as_bytes()).await {
                     eprintln!("Erreur publish: {}", e);
                     break;
                 }
