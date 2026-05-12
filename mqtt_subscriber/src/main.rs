@@ -3,13 +3,19 @@ use std::error::Error;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let mut options = MqttOptions::new("rust-subscriber-1", "localhost", 1885);
-    options.set_keep_alive(std::time::Duration::from_secs(5));
+    let mut options = MqttOptions::new("rust-subscriber-1", "192.168.11.140", 1883);
+    options   
+        .set_keep_alive(std::time::Duration::from_secs(30))
+        // 🔧 clean_session = FALSE pour un dashboard permanent :
+        // reçoit les messages manqués pendant une déco
+        .set_clean_session(false)
+        .set_inflight(20)
+        .set_request_channel_capacity(200);  // Plus grand : le dashboard reçoit beaucoupoptions
 
-    let (client, mut eventloop) = AsyncClient::new(options, 10);
+    let (client, mut eventloop) = AsyncClient::new(options, 200);
 
     // On s'abonne au topic (le # accepte tout sous-test/)
-    client.subscribe("temperature/1", QoS::AtMostOnce).await.unwrap();
+    client.subscribe("Commande/S1", QoS::AtMostOnce).await.unwrap();
     println!("✅ Abonné au topic temperature/1");
 
     loop {

@@ -19,6 +19,7 @@ use esp_hal::gpio::{Level, Output,OutputConfig};
 use esp_hal::rng::Rng;
 use embassy_net::{
     DhcpConfig, Runner, Stack, StackResources,
+    dns::DnsQueryType,
     tcp::TcpSocket,Ipv4Address,
 };
 use esp_println::{self as _, println};
@@ -129,19 +130,19 @@ async fn main(spawner: Spawner) -> ! {
         socket.set_timeout(Some(embassy_time::Duration::from_secs(10)));
 
         //Si tu as un dns -->
-//        let address = match stack
-//            .dns_query("broker.hivemq.com", DnsQueryType::A)
-//            .await
-//            .map(|a| a[0])
-//        {
-//            Ok(address) => address,
-//            Err(e) => {
-//                error!("DNS lookup error: {e:?}");
-//                continue;
-//            }
-//        };
-        let broker_addr = Ipv4Address::new(192, 168, 1, 76); // ← ton IP
-        let remote_endpoint = (broker_addr, 1884);
+//       let address = match stack
+//           .dns_query("Elrabtwine", DnsQueryType::A)
+//           .await
+//           .map(|a| a[0])
+//       {
+//           Ok(address) => address,
+//           Err(e) => {
+//               error!("DNS lookup error: {e:?}");
+//               continue;
+//           }
+//       };
+        let address = Ipv4Address::new(192, 168, 11, 119); // ← ton IP
+        let remote_endpoint = (address, 1884);
         
         info!("connecting...");
         led1.set_high();
@@ -159,6 +160,8 @@ async fn main(spawner: Spawner) -> ! {
         );
         config.add_max_subscribe_qos(rust_mqtt::packet::v5::publish_packet::QualityOfService::QoS1);
         config.add_client_id("ESP_1");
+        // config.clean_session = false; // ← retenir la session entre reconnexions
+        config.keep_alive = 15; // secondes — détecte les connexions mortes
         config.max_packet_size = 100;
         let mut recv_buffer = [0; 80];
         let mut write_buffer = [0; 80];
@@ -200,6 +203,7 @@ async fn main(spawner: Spawner) -> ! {
 
                 Err(_) => { 
                         error!("MQTT Network Error");
+                        break; // ← CRUCIAL : sortir pour recréer le socket
                     } 
             }
 
@@ -210,7 +214,7 @@ async fn main(spawner: Spawner) -> ! {
                         match client
                         .send_message(
                             "temperature/1",
-                            off.as_bytes(),
+                            on.as_bytes(),
                             rust_mqtt::packet::v5::publish_packet::QualityOfService::QoS1,
                             true,
                         )
@@ -237,7 +241,7 @@ async fn main(spawner: Spawner) -> ! {
                         match client
                         .send_message(
                             "temperature/1",
-                            on.as_bytes(),
+                            off.as_bytes(),
                             rust_mqtt::packet::v5::publish_packet::QualityOfService::QoS1,
                             true,
                         )
@@ -262,7 +266,7 @@ async fn main(spawner: Spawner) -> ! {
            
             
             // Switch de la commande pour les tests
-            Timer::after(Duration::from_millis(3000)).await;
+            // Timer::after(Duration::from_millis(3000)).await;
         }
     }
 
