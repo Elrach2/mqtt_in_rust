@@ -3,7 +3,7 @@ use std::error::Error;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let mut options = MqttOptions::new("rust-subscriber-1", "192.168.11.140", 1883);
+    let mut options = MqttOptions::new("rust-subscriber-1", "192.168.11.136", 1885);
     options   
         .set_keep_alive(std::time::Duration::from_secs(30))
         // 🔧 clean_session = FALSE pour un dashboard permanent :

@@ -141,7 +141,7 @@ async fn main(spawner: Spawner) -> ! {
 //               continue;
 //           }
 //       };
-        let address = Ipv4Address::new(192, 168, 11, 119); // ← ton IP
+        let address = Ipv4Address::new(192, 168, 11, 127); // ← ton IP
         let remote_endpoint = (address, 1884);
         
         info!("connecting...");
