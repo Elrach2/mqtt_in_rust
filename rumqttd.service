@@ -1,0 +1,26 @@
+[Unit]
+Description=rumqttd MQTT Broker
+Documentation=https://github.com/bytebeamio/rumqtt
+After=network.target
+
+[Service]
+# Utilisateur sous lequel le service tourne (créez "rumqtt" si nécessaire)
+User=root
+Group=root
+
+# Type simple car rumqttd reste au premier plan
+Type=simple
+
+# Chemin absolu vers l'exécutable et la configuration
+ExecStart=/root/.cargo/bin/rumqttd --config /etc/rumqttd/rumqttd.toml
+
+# Redémarrage automatique en cas d'erreur
+Restart=on-failure
+RestartSec=10
+
+# Sécurité (bonnes pratiques)
+NoNewPrivileges=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

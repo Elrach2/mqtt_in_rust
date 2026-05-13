@@ -3,10 +3,12 @@ runner = "espflash flash --monitor --chip esp32 --log-format defmt"
 
 [env]
 DEFMT_LOG = "info"
-# SSID = "Wifi: star-vision box_2.4G"
-# PASSWORD = "Starvision@2025"
-SSID = "MyCanalBox-2G"
-PASSWORD = "aDrQZYTp3A"
+SSID = "Wifi: star-vision box_2.4G"
+PASSWORD = "Starvision@2025"
+#  SSID = "MyCanalBox-2G"
+#  PASSWORD = "aDrQZYTp3A"
+#  SSID = "Gandema"
+#  PASSWORD = "main1234"
 
 
 [build]

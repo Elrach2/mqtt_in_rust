@@ -5,10 +5,27 @@ use tokio::time::{self, Duration};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     // Configuration du client
-    let mut options = MqttOptions::new("rust-publisher-1", "localhost", 1885);
-    options.set_keep_alive(Duration::from_secs(5));
+    let mut options = MqttOptions::new("rust-publisher-1", "192.168.11.119", 1883);
+    options
+        // 🔧 keepalive 30s : détecte les coupures réseau rapidement
+        // sans surcharger avec des PINGs trop fréquents
+        .set_keep_alive(Duration::from_secs(30))
 
-    let (client, mut eventloop) = AsyncClient::new(options, 10);
+        // 🔧 clean_session = FALSE : le broker garde les sub et les
+        // messages QoS1 en attente si le capteur se déconnecte
+        // → aucun message perdu lors d'une coupure réseau temporaire
+        .set_clean_session(false)
+
+        // 🔧 inflight = 20 : aligné avec max_inflight_count du broker
+        // Ne jamais dépasser la valeur broker-side
+        .set_inflight(20)
+
+        // 🔧 Taille du channel interne : 100 messages en buffer local
+        // avant que le send() soit bloquant → absorbe les micro-bursts
+        .set_request_channel_capacity(100);
+
+
+    let (client, mut eventloop) = AsyncClient::new(options, 100);
 
     let (on , off) = ("ON","OFF");
     let mut state  =  1;

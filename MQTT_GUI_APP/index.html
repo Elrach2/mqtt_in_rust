@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MQTT IoT DashBoard</title>
+  </head>
+  <body>
+    <div id="app">
+
+      <header>
+        <h1>MQTT Simple</h1>
+        <p class="subtitle">Contrôle du topic <code>Commande/S1</code></p>
+      </header>
+
+      <!-- ── Connexion ── -->
+      <section class="card">
+        <h2>Broker MQTT</h2>
+
+        <div class="field">
+          <label for="host">Adresse</label>
+          <input id="host" value="broker.hivemq.com" placeholder="broker.hivemq.com"/>
+        </div>
+
+        <div class="field">
+          <label for="port">Port</label>
+          <input id="port" type="number" value="1883"/>
+        </div>
+
+        <div class="field">
+          <label for="clientId">Client ID</label>
+          <input id="clientId" value=""/>
+        </div>
+
+        <button id="btn-connect" class="btn btn-connect">⚡ Connecter</button>
+
+        <div id="status" class="status">Déconnecté</div>
+        <div id="error" class="error hidden"></div>
+      </section>
+
+      <!-- ── Commandes ── -->
+      <section class="card">
+        <h2>Commande S1</h2>
+        <p class="topic-label">Topic : <code>Commande/S1</code></p>
+
+        <div class="buttons">
+          <button id="btn-on"  class="btn btn-on"  disabled>ON</button>
+          <button id="btn-off" class="btn btn-off" disabled>OFF</button>
+        </div>
+
+        <p id="last-cmd" class="last hidden"></p>
+      </section>
+
+    </div>
+    <script type="module" src="/src/entry-client.ts"></script>
+  </body>
+</html>
