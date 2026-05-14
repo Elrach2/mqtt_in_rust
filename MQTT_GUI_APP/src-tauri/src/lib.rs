@@ -22,7 +22,7 @@ pub fn run() {
     
     // Enregistrer toutes les commandes accessibles depuis le frontend
     // Si tu ajoutes une commande dans mqtt.rs, ajoute-la ici aussi
-    .invoke_handler(tauri::generate_handler![mqtt::connect_mqtt, mqtt::publish_mqtt,])
+    .invoke_handler(tauri::generate_handler![mqtt::connect_mqtt, mqtt::disconnect_mqtt, mqtt::publish_mqtt,])
 
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

@@ -1,4 +1,3 @@
-import './style.css'
 import './style.css';
 
 // ─────────────────────────────────────────────────────────
@@ -18,6 +17,7 @@ const inputHost     = document.getElementById('host')      as HTMLInputElement;
 const inputPort     = document.getElementById('port')      as HTMLInputElement;
 const inputClientId = document.getElementById('clientId')  as HTMLInputElement;
 const btnConnect    = document.getElementById('btn-connect') as HTMLButtonElement;
+const btnDisconnect  = document.getElementById('btn-deconnect') as HTMLButtonElement;
 const btnOn         = document.getElementById('btn-on')    as HTMLButtonElement;
 const btnOff        = document.getElementById('btn-off')   as HTMLButtonElement;
 const statusEl      = document.getElementById('status')    as HTMLDivElement;
@@ -48,6 +48,7 @@ function setError(msg: string) {
 function setConnected(isConnected: boolean) {
   // Activer/désactiver les boutons selon l'état
   btnConnect.disabled    = isConnected;
+  btnDisconnect.disabled  = !isConnected;
   btnOn.disabled         = !isConnected;
   btnOff.disabled        = !isConnected;
   inputHost.disabled     = isConnected;
@@ -56,6 +57,20 @@ function setConnected(isConnected: boolean) {
 
   btnConnect.textContent = isConnected ? '✔ Connecté' : '⚡ Connecter';
 }
+
+function setDisconnected(isConnected: boolean) {
+  // Activer/désactiver les boutons selon l'état
+  btnConnect.disabled    = !isConnected;
+  btnDisconnect.disabled  = isConnected;
+  btnOn.disabled         = !isConnected;
+  btnOff.disabled        = !isConnected;
+  inputHost.disabled     = isConnected;
+  inputPort.disabled     = isConnected;
+  inputClientId.disabled = isConnected;
+
+  btnConnect.textContent = !isConnected ? '✔ Deconnecté' : '⚡ Deconnecter';
+}
+
 
 function showLastCmd(cmd: string) {
   lastCmdEl.innerHTML   = `Dernière commande : <strong class="${cmd.toLowerCase()}">${cmd}</strong>`;
@@ -77,8 +92,8 @@ listen('mqtt:connected', () => {
 });
 
 listen('mqtt:disconnected', () => {
-  setConnected(false);
-  setStatus('Déconnecté', 'neutral');
+  setDisconnected(true);
+  setStatus('Déconnecté', 'ok');
 });
 
 listen('mqtt:error', (event: any) => {
@@ -112,6 +127,28 @@ btnConnect.addEventListener('click', async () => {
     setError(String(e));
   }
 });
+
+// ─────────────────────────────────────────────────────────
+// BOUTON DECONNECTER
+// Au clic → appelle la commande Rust disconnect_mqtt
+// ─────────────────────────────────────────────────────────
+btnDisconnect.addEventListener('click', async () => {
+  setStatus('Deconnexion…', 'neutral');
+  setError('');
+
+  try {
+    // invoke("nom_commande_rust", { paramètres })
+    // Les noms des paramètres doivent correspondre exactement
+    // à ceux définis dans #[tauri::command] fn connect_mqtt(host, port, client_id)
+    await invoke('disconnect_mqtt', {});
+    // Si pas d'erreur : la connexion est initiée
+    // La confirmation arrive via l'événement "mqtt:disconnected"
+  } catch (e: any) {
+    setStatus('Erreur', 'ko');
+    setError(String(e));
+  }
+});
+
 
 // ─────────────────────────────────────────────────────────
 // BOUTONS ON / OFF
