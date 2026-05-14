@@ -29,3 +29,7 @@ tauri-plugin-log = "2"
 
 rumqttc = "0.24"
 tokio = { version = "1", features = ["full"] }
+
+tokio-util = { version = "0.7", features = [
+  "rt",
+] } # Pour la fonction deconnection

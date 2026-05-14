@@ -69,6 +69,11 @@ input:disabled { opacity: .4; cursor: not-allowed; }
   color: #0d1117;
 }
 .btn-connect:not(:disabled):hover { opacity: .85; }
+.btn-deconnect {
+  background: #e84040;
+  color: #0d1117;
+}
+.btn-deconnect:not(:disabled):hover { opacity: .85; }
 
 .buttons {
   display: grid;
@@ -117,3 +122,14 @@ input:disabled { opacity: .4; cursor: not-allowed; }
 .last strong.off { color: #e84040; font-weight: 700; }
 
 .hidden { display: none; }
+
+
+.Connexion{
+  display: flex; /* Active Flexbox */
+  gap: 20px;  /* Espace égal entre TOUS les éléments */
+  width: 100%;   /* Occupe toute la largeur disponible */
+}
+
+.Connexion > *{
+  flex: 1;
+}

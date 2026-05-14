@@ -2,7 +2,7 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/webp" href="dashboard-report-icon-svg-download-png-7506087.webp" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MQTT IoT DashBoard</title>
   </head>
@@ -32,8 +32,10 @@
           <label for="clientId">Client ID</label>
           <input id="clientId" value=""/>
         </div>
-
-        <button id="btn-connect" class="btn btn-connect">⚡ Connecter</button>
+        <div class="Connexion">
+          <button id="btn-connect" class="btn btn-connect">⚡ Connecter</button>
+          <button id="btn-deconnect" class="btn btn-deconnect">⚡ Deconnecter</button>
+        </div>
 
         <div id="status" class="status">Déconnecté</div>
         <div id="error" class="error hidden"></div>
